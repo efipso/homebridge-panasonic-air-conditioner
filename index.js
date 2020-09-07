@@ -2,6 +2,8 @@ var request = require("request"),
 	inherits = require("util").inherits,
 	moment = require('moment');
 
+const Endpoints = require('./lib/endpoints.js');
+
 var Accessory,
 	Characteristic,
 	Service,
@@ -18,6 +20,7 @@ module.exports = function(homebridge) {
 };
 
 function PanasonicAC(log, config) {
+	Endpoints.init(fieldTestMode);
 	this.log = log;
 	this.debug = config["debug"] || false;
 	this.name = config["name"] || "Panasonic Air Conditioner";
@@ -125,7 +128,7 @@ PanasonicAC.prototype = {
 
 		// Call the API
 		request.post({
-			url: "https://accsmart.panasonic.com/auth/login/",
+			url: Endpoints.URL_AUTH_LOGIN,
 			headers: {
 				"Accept": "application/json; charset=UTF-8",
 				"Content-Type": "application/json",
@@ -141,7 +144,7 @@ PanasonicAC.prototype = {
 			if (!err && response.statusCode == 200) {
 				this.uToken = body['uToken'];
 				request.get({
-					url: "https://accsmart.panasonic.com/device/group/",
+					url: Endpoints.URL_DEVICE_GROUP,
 					headers: {
 						"Accept": "application/json; charset=UTF-8",
 						"Content-Type": "application/json",
@@ -201,7 +204,7 @@ PanasonicAC.prototype = {
 		if(this.debug) {this.log("Refresh start");}
 
 		request.get({
-			url: "https://accsmart.panasonic.com/deviceStatus/now/" + this.device,
+			url: Endpoints.URL_DEVICESTATUS_NOW + this.device,
 			headers: {
 				"Accept": "application/json; charset=UTF-8",
 				"Content-Type": "application/json",
@@ -398,7 +401,7 @@ PanasonicAC.prototype = {
 
 		// Call the API
 		request.post({
-			url: "https://accsmart.panasonic.com/deviceStatus/control/",
+			url: Endpoints.URL_DEVICESTATUS_CONTROL,
 			headers: {
 				"Accept": "application/json; charset=UTF-8",
 				"Content-Type": "application/json",
